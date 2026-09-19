@@ -1,0 +1,40 @@
+/* /css/dashboard.css — layout specific to the dashboard and analytics pages */
+
+.today-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.chart-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+
+.chart-empty {
+  color: var(--gray-500);
+  font-size: 13.5px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .today-layout { grid-template-columns: 1fr; }
+  .stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- Analytics ---------- */
+.chart-card-tall { min-height: 280px; }
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.top-list-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--gray-100); font-size: 13.5px; }
+.top-list-row:last-child { border-bottom: none; }
+.top-list-name { font-weight: 600; }
+.top-list-number { color: var(--gray-500); font-size: 12.5px; }
+.top-list-count { font-weight: 700; }
+
+@media (max-width: 900px) {
+  .analytics-grid { grid-template-columns: 1fr; }
+}

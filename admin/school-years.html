@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Years — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>School Years</h1>
+      <p class="page-sub">Only one school year can be active at a time — it controls which sections and enrollments are current.</p>
+    </div>
+
+    <div class="card form-card">
+      <form id="addForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fieldName">Name</label>
+            <input type="text" id="fieldName" placeholder="2026-2027" required>
+          </div>
+          <div class="form-field">
+            <label for="fieldStart">Start Date</label>
+            <input type="date" id="fieldStart" required>
+          </div>
+          <div class="form-field">
+            <label for="fieldEnd">End Date</label>
+            <input type="date" id="fieldEnd" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add School Year</button>
+        </div>
+        <div class="form-error" id="formError"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Range</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="yearsBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initSchoolYearsPage } from '../js/school-years.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initSchoolYearsPage();
+  }
+</script>
+
+</body>
+</html>

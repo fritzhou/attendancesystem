@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Logs — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Audit Logs</h1>
+      <p class="page-sub">A permanent record of every sensitive action taken in the system — nothing here can be edited or deleted.</p>
+    </div>
+
+    <div class="card form-card">
+      <form id="filterForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fieldAction">Action</label>
+            <select id="fieldAction"></select>
+          </div>
+          <div class="form-field">
+            <label for="fieldStart">From</label>
+            <input type="date" id="fieldStart">
+          </div>
+          <div class="form-field">
+            <label for="fieldEnd">To</label>
+            <input type="date" id="fieldEnd">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Date/Time</th><th>Actor</th><th>Action</th><th>Details</th></tr></thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+      <div class="form-actions" style="margin-top:16px;">
+        <button class="btn btn-secondary" id="loadMoreBtn" type="button" style="display:none;">Load More</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initAuditLogsPage } from '../js/audit-logs.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initAuditLogsPage();
+  }
+</script>
+
+</body>
+</html>

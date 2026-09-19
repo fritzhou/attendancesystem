@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Print QR Codes — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/qr-card.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="pageTitle">Print QR Codes</h1>
+      <p class="page-sub"><a href="/admin/students.html">&larr; Back to Students</a></p>
+    </div>
+
+    <div class="qr-page-toolbar no-print">
+      <button class="btn btn-primary" id="printBtn" type="button">Print This Section</button>
+    </div>
+
+    <div id="loadingState" class="empty-state">Loading...</div>
+    <div class="qr-grid" id="qrGrid"></div>
+    <div id="emptyState" class="qr-empty-state" style="display:none;"></div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { supabase } from '../js/supabaseClient.js';
+  import { renderQrCard, gradeStrandSectionLabel } from '../js/qr.js';
+
+  const profile = await requireRole(['admin']);
+  if (!profile) throw new Error('unauthorized');
+  renderShell(profile);
+
+  const sectionId = new URLSearchParams(window.location.search).get('section');
+  const loadingState = document.getElementById('loadingState');
+
+  if (!sectionId) {
+    loadingState.textContent = 'No section specified.';
+  } else {
+    await loadSection();
+  }
+
+  async function loadSection() {
+    const { data: section, error: sectionError } = await supabase
+      .from('sections')
+      .select('grade_level, section_name, strands(code), school_years(name)')
+      .eq('id', sectionId)
+      .single();
+
+    if (sectionError || !section) {
+      loadingState.textContent = 'Section not found.';
+      return;
+    }
+
+    document.getElementById('pageTitle').textContent =
+      `Print QR Codes — Grade ${section.grade_level} ${section.strands.code} / ${section.section_name}`;
+
+    const { data: enrollments } = await supabase
+      .from('enrollments')
+      .select('students(id, student_number, full_name, registration_status, qr_token)')
+      .eq('section_id', sectionId)
+      .eq('enrollment_status', 'ACTIVE');
+
+    loadingState.style.display = 'none';
+
+    const activeStudents = (enrollments || [])
+      .map(e => e.students)
+      .filter(s => s && s.registration_status === 'ACTIVE' && s.qr_token);
+
+    if (activeStudents.length === 0) {
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('emptyState').textContent =
+        'No active students with QR codes in this section yet.';
+      return;
+    }
+
+    const grid = document.getElementById('qrGrid');
+    const gradeStrandSection = gradeStrandSectionLabel({
+      grade_level: section.grade_level, section_name: section.section_name, strands: section.strands
+    });
+
+    activeStudents.forEach(s => {
+      const cardWrap = document.createElement('div');
+      grid.appendChild(cardWrap);
+      renderQrCard(cardWrap, {
+        studentName: s.full_name,
+        studentNumber: s.student_number,
+        gradeStrandSection,
+        token: s.qr_token
+      });
+    });
+
+    document.getElementById('printBtn').onclick = () => window.print();
+  }
+</script>
+
+</body>
+</html>

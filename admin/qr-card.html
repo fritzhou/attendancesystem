@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student QR Code — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/qr-card.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="pageTitle">Student QR Code</h1>
+      <p class="page-sub"><a href="/admin/students.html">&larr; Back to Students</a></p>
+    </div>
+
+    <div id="loadingState" class="empty-state">Loading...</div>
+
+    <div id="cardArea" style="display:none;">
+      <div class="qr-page-toolbar no-print">
+        <button class="btn btn-primary" id="printBtn" type="button">Print</button>
+        <button class="btn btn-secondary" id="downloadBtn" type="button">Download QR Image</button>
+        <button class="btn btn-secondary" id="regenerateBtn" type="button">Regenerate QR</button>
+        <button class="btn btn-danger" id="revokeBtn" type="button">Revoke QR</button>
+      </div>
+      <div class="qr-card-single-wrap" id="cardContainer"></div>
+    </div>
+
+    <div id="noQrState" class="qr-empty-state" style="display:none;">
+      <p id="noQrMessage"></p>
+      <button class="btn btn-primary no-print" id="generateBtn" type="button" style="display:none;">Generate QR Code</button>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { supabase } from '../js/supabaseClient.js';
+  import { renderQrCard, gradeStrandSectionLabel } from '../js/qr.js';
+
+  const profile = await requireRole(['admin']);
+  if (!profile) throw new Error('unauthorized');
+  renderShell(profile);
+
+  const studentId = new URLSearchParams(window.location.search).get('id');
+  if (!studentId) {
+    document.getElementById('loadingState').textContent = 'No student specified.';
+  } else {
+    await loadAndRender();
+  }
+
+  async function loadAndRender() {
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('cardArea').style.display = 'none';
+    document.getElementById('noQrState').style.display = 'none';
+
+    const { data: student, error } = await supabase
+      .from('students')
+      .select('id, student_number, full_name, registration_status, qr_token')
+      .eq('id', studentId)
+      .single();
+
+    if (error || !student) {
+      document.getElementById('loadingState').textContent = 'Student not found.';
+      return;
+    }
+
+    document.getElementById('pageTitle').textContent = `QR Code — ${student.full_name}`;
+    document.getElementById('loadingState').style.display = 'none';
+
+    const generateBtn = document.getElementById('generateBtn');
+
+    if (student.registration_status !== 'ACTIVE') {
+      document.getElementById('noQrState').style.display = 'block';
+      document.getElementById('noQrMessage').textContent =
+        `This student's status is "${student.registration_status}" — only Active students have a QR code.`;
+      generateBtn.style.display = 'none';
+      return;
+    }
+
+    if (!student.qr_token) {
+      document.getElementById('noQrState').style.display = 'block';
+      document.getElementById('noQrMessage').textContent =
+        'This student is Active but has no QR code yet.';
+      generateBtn.style.display = 'inline-flex';
+      generateBtn.onclick = () => generateOrRegenerate(false);
+      return;
+    }
+
+    const { data: enr } = await supabase
+      .from('enrollments')
+      .select('grade_level, section_name, strands(code)')
+      .eq('student_id', studentId)
+      .eq('enrollment_status', 'ACTIVE')
+      .maybeSingle();
+
+    document.getElementById('cardArea').style.display = 'block';
+
+    renderQrCard(document.getElementById('cardContainer'), {
+      studentName: student.full_name,
+      studentNumber: student.student_number,
+      gradeStrandSection: gradeStrandSectionLabel(enr),
+      token: student.qr_token
+    });
+
+    document.getElementById('printBtn').onclick = () => window.print();
+
+    document.getElementById('downloadBtn').onclick = () => {
+      const canvas = document.querySelector('#cardContainer canvas');
+      if (!canvas) return;
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `${student.student_number}-qr.png`;
+      a.click();
+    };
+
+    document.getElementById('regenerateBtn').onclick = () => generateOrRegenerate(true);
+    document.getElementById('revokeBtn').onclick = async () => {
+      if (!confirm("This disables the student's QR code until it's regenerated. Continue?")) return;
+      const { data, error } = await supabase.rpc('revoke_qr_token', { p_student_id: studentId });
+      if (error || !data.success) { alert(data?.message || 'Could not revoke QR code.'); return; }
+      await loadAndRender();
+    };
+  }
+
+  async function generateOrRegenerate(isRegenerate) {
+    if (isRegenerate && !confirm('This invalidates the current QR code — the student will need their card reprinted. Continue?')) return;
+    const { data, error } = await supabase.rpc('regenerate_qr_token', { p_student_id: studentId });
+    if (error || !data.success) { alert(data?.message || 'Could not generate a QR code.'); return; }
+    await loadAndRender();
+  }
+</script>
+
+</body>
+</html>

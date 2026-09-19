@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check Registration Status — Pilgrim Attend</title>
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/components.css">
+<style>
+  body { display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; }
+  .status-card { width: 100%; max-width: 420px; }
+  .status-badge-row { display: flex; justify-content: center; margin: 14px 0; }
+  .status-badge-row .badge { font-size: 14px; padding: 6px 16px; }
+</style>
+</head>
+<body>
+
+<div class="card status-card">
+  <div class="page-header">
+    <h1>Check Registration Status</h1>
+    <p class="page-sub">Pilgrim Christian College</p>
+  </div>
+
+  <div class="form-field">
+    <label for="studentNumber">Student Number</label>
+    <input type="text" id="studentNumber" placeholder="2026-001">
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" id="checkBtn" style="width:100%;">Check Status</button>
+  </div>
+
+  <div id="result" style="display:none; margin-top:20px;">
+    <div class="status-badge-row"><span class="badge" id="statusBadge"></span></div>
+    <div class="info-row" style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f1f5f9; font-size:14px;">
+      <span style="color:#6b7280;">Full Name</span><strong id="infoName"></strong>
+    </div>
+  </div>
+
+  <div class="form-error" id="errorMsg" style="margin-top:16px;"></div>
+
+  <p class="text-muted" style="margin-top:20px; text-align:center;">
+    Not registered yet? <a href="/register.html" style="color:var(--blue-700); font-weight:600;">Register here</a>
+  </p>
+</div>
+
+<script type="module">
+  import { lookupStudent, statusLabel, statusBadgeClass } from './js/registration.js';
+
+  document.getElementById('checkBtn').addEventListener('click', async () => {
+    const errorBox = document.getElementById('errorMsg');
+    const resultBox = document.getElementById('result');
+    errorBox.style.display = 'none';
+    resultBox.style.display = 'none';
+
+    const number = document.getElementById('studentNumber').value.trim();
+    if (!number) return;
+
+    try {
+      const result = await lookupStudent(number);
+
+      if (!result.found) {
+        errorBox.textContent = 'Student number not found.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('infoName').textContent = result.full_name;
+      const badge = document.getElementById('statusBadge');
+      badge.textContent = statusLabel(result.registration_status);
+      badge.className = `badge ${statusBadgeClass(result.registration_status)}`;
+      resultBox.style.display = 'block';
+
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>

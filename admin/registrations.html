@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pending Registrations — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Pending Registrations</h1>
+      <p class="page-sub">Compare the submitted photo against the official roster info before approving.</p>
+    </div>
+
+    <div class="bulk-bar" id="bulkBar">
+      <span><strong id="bulkCount">0</strong> selected</span>
+      <button class="btn btn-primary btn-sm" id="bulkApproveBtn">Approve Selected</button>
+      <button class="btn btn-danger btn-sm" id="bulkRejectBtn">Reject Selected</button>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll"></th>
+              <th>Photo</th><th>Full Name</th><th>Student #</th>
+              <th>Grade / Strand / Section</th><th>Submitted</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="regBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <button class="modal-close" id="modalCloseBtn">&times;</button>
+  <img class="modal-photo" id="modalImg" alt="Full size photo">
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initRegistrationsPage } from '../js/registrations.js';
+
+  const profile = await requireRole(['admin', 'teacher']);
+  if (profile) {
+    renderShell(profile);
+    initRegistrationsPage();
+  }
+</script>
+
+</body>
+</html>

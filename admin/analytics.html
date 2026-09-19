@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Analytics</h1>
+      <p class="page-sub">School-wide attendance trends for the selected school year.</p>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="fieldYear">School Year</label>
+          <select id="fieldYear"></select>
+        </div>
+      </div>
+    </div>
+
+    <div id="loadingState" class="empty-state">Loading...</div>
+
+    <div id="analyticsArea" style="display:none;">
+      <h2 class="section-title">Overview</h2>
+      <div class="stat-grid" id="overviewStats"></div>
+
+      <h2 class="section-title">Attendance Trend by Month</h2>
+      <div class="card chart-card chart-card-tall">
+        <canvas id="monthlyChart"></canvas>
+        <p class="chart-empty" id="monthlyEmpty" style="display:none;">Not enough data yet to show a trend.</p>
+      </div>
+
+      <div class="analytics-grid" style="margin-top:20px;">
+        <div>
+          <h2 class="section-title">Attendance by Section</h2>
+          <div class="card chart-card chart-card-tall">
+            <canvas id="sectionChart"></canvas>
+            <p class="chart-empty" id="sectionChartEmpty" style="display:none;">No data yet.</p>
+          </div>
+        </div>
+        <div>
+          <h2 class="section-title">Attendance by Subject</h2>
+          <div class="card chart-card chart-card-tall">
+            <canvas id="subjectChart"></canvas>
+            <p class="chart-empty" id="subjectChartEmpty" style="display:none;">No data yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid" style="margin-top:20px;">
+        <div>
+          <h2 class="section-title">Most Frequent Absences</h2>
+          <div class="card" id="topAbsentList"></div>
+        </div>
+        <div>
+          <h2 class="section-title">Most Frequent Late Arrivals</h2>
+          <div class="card" id="topLateList"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initAnalyticsPage } from '../js/analytics.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initAnalyticsPage();
+  }
+</script>
+
+</body>
+</html>

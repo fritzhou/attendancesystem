@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+
+<div id="app">
+  <header id="topbar"></header>
+
+  <main id="content">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p class="page-sub" id="welcomeMsg"></p>
+    </div>
+
+    <div class="banner" id="yearBanner" style="display:none;"></div>
+
+    <h2 class="section-title">Overview</h2>
+    <div class="stat-grid" id="overviewStats">
+      <div class="empty-state">Loading...</div>
+    </div>
+
+    <h2 class="section-title">Today's Attendance</h2>
+    <div class="today-layout">
+      <div class="stat-grid stat-grid-4" id="todayStats"></div>
+      <div class="card chart-card">
+        <canvas id="todayChart" width="260" height="220"></canvas>
+        <p class="chart-empty" id="chartEmpty" style="display:none;">No attendance recorded yet today.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initAdminDashboard } from '../js/dashboard.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initAdminDashboard(profile);
+  }
+</script>
+
+</body>
+</html>

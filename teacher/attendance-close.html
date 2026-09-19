@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Close Attendance — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="pageTitle">Close Attendance</h1>
+      <p class="page-sub" id="pageSub"></p>
+    </div>
+
+    <div class="card" id="previewCard">
+      <div class="stat-grid" id="previewStats"></div>
+      <div class="form-actions">
+        <button class="btn btn-danger" id="confirmBtn" type="button">Confirm Close Attendance</button>
+        <button class="btn btn-secondary" id="backBtn" type="button">Back to Scanner</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initCloseAttendancePage } from '../js/attendance-close.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initCloseAttendancePage();
+  }
+</script>
+
+</body>
+</html>

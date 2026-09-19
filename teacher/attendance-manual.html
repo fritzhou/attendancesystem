@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual Attendance — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="pageTitle">Manual Attendance</h1>
+      <p class="page-sub" id="pageSub"></p>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-field">
+        <label for="searchInput">Search Student</label>
+        <input type="text" id="searchInput" placeholder="Name or student number">
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="rosterList"></div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initManualAttendancePage } from '../js/attendance-manual.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initManualAttendancePage();
+  }
+</script>
+
+</body>
+</html>

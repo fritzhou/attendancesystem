@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Import Students — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Import Students</h1>
+      <p class="page-sub">Upload the official roster as CSV or Excel. Every section referenced must already exist under Sections.</p>
+    </div>
+
+    <div class="card form-card">
+      <div class="upload-drop">
+        Columns expected: <strong>student_number, full_name, grade_level, strand, section, school_year</strong>
+        <br><br>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+        <div id="uploadStatus" class="summary-line"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="downloadTemplateBtn" type="button">Download CSV Template</button>
+      </div>
+    </div>
+
+    <div class="card" id="previewSection" style="display:none;">
+      <div class="stat-grid" id="summaryStats"></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="importBtn" disabled>Import Valid Rows</button>
+        <button class="btn btn-secondary" id="downloadErrorsBtn" disabled>Download Error Rows</button>
+        <button class="btn btn-secondary" id="cancelBtn" type="button">Cancel</button>
+      </div>
+
+      <div class="table-scroll" style="margin-top:16px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Row</th><th>Student #</th><th>Full Name</th><th>Grade</th>
+              <th>Strand</th><th>Section</th><th>School Year</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initImportPage } from '../js/imports.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initImportPage(profile);
+  }
+</script>
+
+</body>
+</html>

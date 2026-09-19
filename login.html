@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Pilgrim Attend</title>
+<style>
+  :root {
+    --blue: #1d4ed8;
+    --blue-dark: #1e3a8a;
+    --gray-bg: #f4f6fb;
+    --gray-border: #d7dce5;
+    --text: #1f2937;
+    --danger: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    padding: 16px;
+  }
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border: 1px solid var(--gray-border);
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  }
+  .school {
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 20px;
+    text-align: center;
+    margin: 0 0 24px;
+    color: var(--blue-dark);
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+  }
+  button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 11px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: var(--blue-dark); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .error {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: #fef2f2;
+    color: var(--danger);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 13.5px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="school">Pilgrim Christian College</div>
+  <h1>Staff Login</h1>
+
+  <form id="loginForm">
+    <label for="email">Email</label>
+    <input type="email" id="email" required autocomplete="username">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" required autocomplete="current-password">
+
+    <button type="submit" id="submitBtn">Log In</button>
+  </form>
+
+  <div class="error" id="errorBox"></div>
+</div>
+
+<script type="module">
+  import { signIn, dashboardPathForRole } from './js/auth.js';
+
+  const form = document.getElementById('loginForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errorBox = document.getElementById('errorBox');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const { profile } = await signIn(email, password);
+
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
+
+      window.location.href = next && next !== '/login.html'
+        ? next
+        : dashboardPathForRole(profile.role);
+
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Log In';
+    }
+  });
+</script>
+
+</body>
+</html>

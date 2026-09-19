@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Students — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Students</h1>
+      <p class="page-sub">Search the full roster, and open a student's QR card once they're Active.</p>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="searchInput">Search</label>
+          <input type="text" id="searchInput" placeholder="Name or student number">
+        </div>
+        <div class="form-field">
+          <label for="filterStatus">Status</label>
+          <select id="filterStatus">
+            <option value="">All Statuses</option>
+            <option value="UNREGISTERED">Not Registered</option>
+            <option value="PENDING">Pending</option>
+            <option value="ACTIVE">Active</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="ARCHIVED">Archived</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="filterSection">Section</label>
+          <select id="filterSection"><option value="">All Sections</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="printSectionSelect">Print All QR Codes for a Section</label>
+          <select id="printSectionSelect"><option value="">Choose a section...</option></select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="printSectionBtn" type="button">Open Print View</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>Student #</th><th>Grade / Strand / Section</th><th>Status</th><th>QR</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="studentsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initStudentsPage } from '../js/students.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initStudentsPage();
+  }
+</script>
+
+</body>
+</html>

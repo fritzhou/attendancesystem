@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sections — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Sections</h1>
+      <p class="page-sub">A section belongs to one school year, grade level, and strand.</p>
+    </div>
+
+    <div class="card form-card">
+      <form id="addForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fieldYear">School Year</label>
+            <select id="fieldYear"></select>
+          </div>
+          <div class="form-field">
+            <label for="fieldGrade">Grade Level</label>
+            <select id="fieldGrade">
+              <option value="7">Grade 7</option>
+              <option value="8">Grade 8</option>
+              <option value="9">Grade 9</option>
+              <option value="10">Grade 10</option>
+              <option value="11">Grade 11</option>
+              <option value="12" selected>Grade 12</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="fieldStrand">Strand</label>
+            <select id="fieldStrand"></select>
+          </div>
+          <div class="form-field">
+            <label for="fieldSectionName">Section Name</label>
+            <input type="text" id="fieldSectionName" placeholder="ICT-A" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add Section</button>
+        </div>
+        <div class="form-error" id="formError"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <table class="data-table">
+        <thead><tr><th>School Year</th><th>Grade</th><th>Strand</th><th>Section</th><th>Actions</th></tr></thead>
+        <tbody id="sectionsBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initSectionsPage } from '../js/sections.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initSectionsPage();
+  }
+</script>
+
+</body>
+</html>

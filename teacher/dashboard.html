@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="welcomeMsg">Welcome</h1>
+    </div>
+
+    <h2 class="section-title">Today's Classes</h2>
+    <div class="card" id="todaysClasses"></div>
+
+    <h2 class="section-title">Pending Registrations</h2>
+    <div class="stat-grid">
+      <a href="/teacher/registrations.html" class="stat-card accent-yellow" style="text-decoration:none;">
+        <div class="stat-card-label">Awaiting Review</div>
+        <div class="stat-card-value" id="pendingCount">0</div>
+      </a>
+    </div>
+
+    <h2 class="section-title">Recently Completed</h2>
+    <div class="card" id="recentSessions"></div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initTeacherDashboard } from '../js/teacher-dashboard.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initTeacherDashboard(profile);
+  }
+</script>
+
+</body>
+</html>

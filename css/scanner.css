@@ -1,0 +1,39 @@
+/* /css/scanner.css */
+
+.scanner-layout { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+
+.scanner-camera-card { text-align: center; }
+#qr-reader { width: 100%; border-radius: 12px; overflow: hidden; }
+.scanner-toolbar { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center; }
+.scanner-class-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.scanner-late-label { font-size: 12.5px; color: var(--gray-500); margin-bottom: 14px; }
+
+.live-row {
+  display: grid; grid-template-columns: 1fr auto auto auto;
+  gap: 10px; align-items: center; padding: 9px 0;
+  border-bottom: 1px solid var(--gray-100); font-size: 13.5px;
+}
+.live-row:last-child { border-bottom: none; }
+.live-number { color: var(--gray-500); }
+.live-time { color: var(--gray-500); font-size: 12.5px; }
+
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.75);
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px;
+}
+.confirm-overlay.visible { display: flex; }
+.confirm-box { background: #fff; border-radius: 16px; padding: 28px 32px; text-align: center; width: 100%; max-width: 320px; }
+.confirm-status { font-size: 20px; font-weight: 800; letter-spacing: 0.02em; margin-bottom: 12px; }
+.confirm-present .confirm-status { color: var(--green-700); }
+.confirm-late .confirm-status { color: var(--amber-700); }
+.confirm-already .confirm-status { color: var(--yellow-700); }
+.confirm-error .confirm-status { color: var(--red-700); }
+.confirm-photo { width: 110px; height: 110px; border-radius: 12px; object-fit: cover; margin: 0 auto 12px; display: block; background: var(--gray-100); }
+.confirm-name { font-size: 17px; font-weight: 700; color: var(--gray-900); }
+.confirm-number { font-size: 13.5px; color: var(--gray-500); margin-top: 2px; }
+.confirm-time { font-size: 13.5px; color: var(--gray-700); margin-top: 8px; }
+.confirm-message { font-size: 13.5px; color: var(--gray-700); margin-top: 6px; }
+
+@media (max-width: 850px) {
+  .scanner-layout { grid-template-columns: 1fr; }
+}

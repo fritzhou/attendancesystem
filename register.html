@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registration — Pilgrim Attend</title>
+<style>
+  :root {
+    --blue: #1d4ed8; --blue-dark: #1e3a8a; --gray-bg: #f4f6fb;
+    --gray-border: #d7dce5; --text: #1f2937; --danger: #b91c1c;
+    --green: #15803d; --green-bg: #f0fdf4; --amber-bg: #fffbeb; --amber: #b45309;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--gray-bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text); padding: 24px 16px; display: flex; justify-content: center;
+  }
+  .card {
+    width: 100%; max-width: 460px; background: #fff;
+    border: 1px solid var(--gray-border); border-radius: 14px;
+    padding: 28px 26px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); height: fit-content;
+  }
+  .school { font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; text-align: center; }
+  h1 { font-size: 19px; text-align: center; margin: 4px 0 22px; color: var(--blue-dark); }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+  input[type="text"], input[type="file"] {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--gray-border);
+    border-radius: 8px; font-size: 15px;
+  }
+  button {
+    width: 100%; margin-top: 18px; padding: 11px; background: var(--blue);
+    color: #fff; border: none; border-radius: 8px; font-size: 15px;
+    font-weight: 600; cursor: pointer;
+  }
+  button:hover { background: var(--blue-dark); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.secondary { background: #fff; color: var(--text); border: 1px solid var(--gray-border); margin-top: 10px; }
+  button.secondary:hover { background: #f8fafc; }
+  .msg { margin-top: 14px; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; display: none; }
+  .msg-error { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+  .msg-notice { background: var(--amber-bg); color: var(--amber); border: 1px solid #fde68a; }
+  .msg-success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+  .info-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+  .info-row span:first-child { color: #6b7280; }
+  .info-row span:last-child { font-weight: 600; }
+  .requirements { background: #f8fafc; border: 1px solid var(--gray-border); border-radius: 8px; padding: 12px 14px; margin-top: 6px; font-size: 13px; color: #475569; }
+  .requirements li { margin-bottom: 3px; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .preview-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="school">Pilgrim Christian College</div>
+  <h1>Student Registration</h1>
+
+  <!-- STEP 1: enter student number -->
+  <div class="step active" id="step1">
+    <label for="studentNumber">Student Number</label>
+    <input type="text" id="studentNumber" placeholder="2026-001" autocomplete="off">
+    <button id="lookupBtn">Look Up</button>
+    <div class="msg" id="lookupMsg"></div>
+  </div>
+
+  <!-- STEP 2: confirm info + photo -->
+  <div class="step" id="step2">
+    <div class="info-row"><span>Full Name</span><span id="infoName"></span></div>
+    <div class="info-row"><span>Student Number</span><span id="infoNumber"></span></div>
+    <div class="info-row"><span>Grade & Strand</span><span id="infoGrade"></span></div>
+    <div class="info-row"><span>Section</span><span id="infoSection"></span></div>
+
+    <label>Profile Photo</label>
+    <ul class="requirements">
+      <li>Clear, front-facing photo of your face</li>
+      <li>Good lighting, no heavy filters</li>
+      <li>Only you in the photo</li>
+      <li>Recent photo</li>
+    </ul>
+    <input type="file" id="photoInput" accept="image/*">
+    <img id="photoPreview" class="preview-img">
+
+    <button id="submitBtn">Submit Registration</button>
+    <button class="secondary" id="backBtn" type="button">Check a Different Number</button>
+    <div class="msg" id="submitMsg"></div>
+  </div>
+
+  <!-- STEP 3: success -->
+  <div class="step" id="step3">
+    <div class="msg msg-success" style="display:block;">
+      Registration submitted! Your status is now <strong>Pending Review</strong>.
+      A teacher or admin will verify your photo before your QR code is activated.
+    </div>
+    <button id="doneBtn" type="button">Register Another Student</button>
+  </div>
+</div>
+
+<script type="module">
+  import { lookupStudent, uploadRegistrationPhoto, submitRegistration, validatePhotoFile, blockingMessage } from './js/registration.js';
+
+  let currentNumber = '';
+  let selectedFile = null;
+
+  const showStep = (n) => {
+    ['step1','step2','step3'].forEach((id, i) => {
+      document.getElementById(id).classList.toggle('active', i === n - 1);
+    });
+  };
+
+  const showMsg = (el, text, type) => {
+    el.textContent = text;
+    el.className = `msg msg-${type}`;
+    el.style.display = 'block';
+  };
+  const hideMsg = (el) => { el.style.display = 'none'; };
+
+  document.getElementById('lookupBtn').addEventListener('click', async () => {
+    const msg = document.getElementById('lookupMsg');
+    hideMsg(msg);
+    const number = document.getElementById('studentNumber').value.trim();
+    if (!number) return;
+
+    const btn = document.getElementById('lookupBtn');
+    btn.disabled = true; btn.textContent = 'Looking up...';
+
+    try {
+      const result = await lookupStudent(number);
+
+      if (!result.found) {
+        showMsg(msg, 'Student number not found. Contact the admin office if you believe this is an error.', 'error');
+        return;
+      }
+
+      const blocked = blockingMessage(result.registration_status);
+      if (blocked) {
+        showMsg(msg, blocked, 'notice');
+        return;
+      }
+
+      currentNumber = number;
+      document.getElementById('infoName').textContent = result.full_name;
+      document.getElementById('infoNumber').textContent = number;
+      document.getElementById('infoGrade').textContent =
+        result.grade_level ? `Grade ${result.grade_level} – ${result.strand}` : 'Not yet enrolled';
+      document.getElementById('infoSection').textContent = result.section || '—';
+      showStep(2);
+
+    } catch (err) {
+      showMsg(msg, err.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Look Up';
+    }
+  });
+
+  document.getElementById('photoInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const preview = document.getElementById('photoPreview');
+    if (!file) { preview.style.display = 'none'; selectedFile = null; return; }
+
+    const err = validatePhotoFile(file);
+    const msg = document.getElementById('submitMsg');
+    if (err) {
+      showMsg(msg, err, 'error');
+      e.target.value = '';
+      preview.style.display = 'none';
+      selectedFile = null;
+      return;
+    }
+
+    hideMsg(msg);
+    selectedFile = file;
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const msg = document.getElementById('submitMsg');
+    hideMsg(msg);
+
+    if (!selectedFile) {
+      showMsg(msg, 'Please choose a photo first.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+
+    try {
+      const path = await uploadRegistrationPhoto(currentNumber, selectedFile);
+      const result = await submitRegistration(currentNumber, path);
+
+      if (!result.success) {
+        showMsg(msg, result.message, 'error');
+        return;
+      }
+
+      showStep(3);
+
+    } catch (err) {
+      showMsg(msg, err.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Submit Registration';
+    }
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    showStep(1);
+    document.getElementById('studentNumber').value = '';
+    hideMsg(document.getElementById('lookupMsg'));
+  });
+
+  document.getElementById('doneBtn').addEventListener('click', () => {
+    currentNumber = ''; selectedFile = null;
+    document.getElementById('studentNumber').value = '';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    hideMsg(document.getElementById('lookupMsg'));
+    hideMsg(document.getElementById('submitMsg'));
+    showStep(1);
+  });
+</script>
+
+</body>
+</html>

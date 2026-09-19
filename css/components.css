@@ -1,0 +1,227 @@
+/* /css/components.css — reusable UI pieces: cards, stats, badges, tables, forms */
+
+.card {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+/* ---------- Stat cards ---------- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+.stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.stat-card-value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: var(--gray-900);
+}
+.stat-card.accent-blue   .stat-card-value { color: var(--blue-700); }
+.stat-card.accent-green  .stat-card-value { color: var(--green-700); }
+.stat-card.accent-amber  .stat-card-value { color: var(--amber-700); }
+.stat-card.accent-red    .stat-card-value { color: var(--red-700); }
+.stat-card.accent-yellow { background: var(--yellow-50); border-color: #fde68a; }
+.stat-card.accent-yellow .stat-card-value { color: var(--yellow-700); }
+
+/* ---------- Status badges ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-present { background: var(--green-50);  color: var(--green-700); }
+.badge-late    { background: var(--amber-50);  color: var(--amber-700); }
+.badge-absent  { background: var(--red-50);    color: var(--red-700); }
+.badge-excused { background: var(--gray-badge-50); color: var(--gray-badge-700); }
+.badge-pending { background: var(--yellow-50); color: var(--yellow-700); }
+
+/* ---------- Tables ---------- */
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.data-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--gray-500);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+table.data-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--gray-100);
+}
+table.data-table tr:last-child td { border-bottom: none; }
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-primary { background: var(--blue-600); color: #fff; }
+.btn-primary:hover { background: var(--blue-700); }
+.btn-secondary { background: #fff; border-color: var(--gray-200); color: var(--gray-700); }
+.btn-secondary:hover { background: var(--gray-100); }
+
+/* ---------- Banner / notice ---------- */
+
+.banner {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--yellow-50);
+  border: 1px solid #fde68a;
+  color: var(--yellow-700);
+  font-size: 13.5px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Empty state ---------- */
+
+.empty-state { text-align: center; padding: 24px; color: var(--gray-500); font-size: 14px; }
+
+/* ---------- Forms & toolbars ---------- */
+.form-card { margin-bottom: 24px; }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field label { font-size: 13px; font-weight: 600; color: var(--gray-700); }
+.form-field input, .form-field select {
+  padding: 9px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.form-field input:focus, .form-field select:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+.checkbox-field { flex-direction: row; align-items: center; gap: 8px; }
+.checkbox-field input { width: auto; }
+.form-actions { margin-top: 16px; display: flex; gap: 10px; }
+.form-error {
+  margin-top: 12px; padding: 10px 12px;
+  background: var(--red-50); color: var(--red-700);
+  border: 1px solid #fecaca; border-radius: 8px;
+  font-size: 13.5px; display: none;
+}
+.btn-sm { padding: 5px 12px; font-size: 12.5px; }
+.btn-danger { background: var(--red-50); color: var(--red-700); border-color: #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+.text-muted { color: var(--gray-500); font-size: 13px; }
+
+/* ---------- Scrollable table wrapper (for long import previews) ---------- */
+.table-scroll { max-height: 420px; overflow-y: auto; border-radius: var(--radius); }
+.table-scroll table.data-table thead th {
+  position: sticky; top: 0; background: #fff; z-index: 1;
+}
+.row-error { background: var(--red-50); }
+.error-reasons { font-size: 12.5px; color: var(--red-700); }
+.upload-drop {
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 14px;
+}
+.upload-drop input[type="file"] { margin-top: 10px; }
+.summary-line { font-size: 14px; color: var(--gray-700); margin: 4px 0 16px; }
+
+/* ---------- Registration review: photo thumbnails + lightbox ---------- */
+.photo-thumb {
+  width: 46px; height: 46px; border-radius: 8px;
+  object-fit: cover; cursor: pointer; border: 1px solid var(--gray-200);
+  background: var(--gray-100);
+}
+.bulk-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: var(--blue-50);
+  border: 1px solid var(--blue-100); border-radius: 10px;
+  margin-bottom: 14px; font-size: 13.5px; display: none;
+}
+.bulk-bar.visible { display: flex; }
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.75);
+  display: none; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+}
+.modal-overlay.visible { display: flex; }
+.modal-photo { max-width: 90vw; max-height: 85vh; border-radius: 10px; }
+.modal-close {
+  position: absolute; top: 20px; right: 24px; color: #fff;
+  font-size: 28px; background: none; border: none; cursor: pointer;
+}
+
+/* ---------- Schedule slots ---------- */
+.slot-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; }
+.slot-row:last-child { border-bottom: none; }
+.slot-day { font-weight: 600; width: 90px; flex-shrink: 0; }
+.slot-time { color: var(--gray-700); flex: 1; }
+.back-link { font-size: 13.5px; color: var(--blue-700); font-weight: 600; }
+
+/* ---------- Today's classes (teacher dashboard) ---------- */
+.class-row { display: flex; align-items: center; gap: 14px; padding: 12px 4px; border-bottom: 1px solid var(--gray-100); }
+.class-row:last-child { border-bottom: none; }
+.class-row-time { width: 90px; font-weight: 700; color: var(--blue-700); font-size: 13.5px; flex-shrink: 0; }
+.class-row-info { flex: 1; }
+.class-row-subject { font-weight: 600; font-size: 14.5px; }
+.class-row-section { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+/* ---------- Manual attendance roster ---------- */
+.manual-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); flex-wrap: wrap; }
+.manual-row:last-child { border-bottom: none; }
+.manual-row-info { flex: 1; min-width: 160px; }
+.manual-row-name { font-weight: 600; font-size: 14px; }
+.manual-row-number { font-size: 12.5px; color: var(--gray-500); }
+.manual-row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.manual-btn { padding: 5px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--gray-200); background: #fff; cursor: pointer; font-weight: 600; }
+.manual-btn.active-present { background: var(--green-50); border-color: #bbf7d0; color: var(--green-700); }
+.manual-btn.active-late { background: var(--amber-50); border-color: #fde68a; color: var(--amber-700); }
+.manual-btn.active-absent { background: var(--red-50); border-color: #fecaca; color: var(--red-700); }
+.manual-btn.active-excused { background: var(--gray-badge-50); border-color: var(--gray-200); color: var(--gray-badge-700); }
+
+/* ---------- Audit logs ---------- */
+.audit-actor { font-weight: 600; }
+.audit-meta { font-size: 12.5px; color: var(--gray-500); margin-top: 2px; }
+.audit-action-tag {
+  display: inline-flex; padding: 3px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; background: var(--blue-50); color: var(--blue-700);
+}

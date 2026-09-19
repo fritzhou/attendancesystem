@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Report — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<style>
+  .profile-header { display: flex; gap: 18px; align-items: center; margin-bottom: 20px; }
+  .profile-photo { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; background: var(--gray-100); border: 1px solid var(--gray-200); }
+</style>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <p class="page-sub"><a href="/admin/students.html">&larr; Back to Students</a></p>
+    </div>
+
+    <div class="profile-header">
+      <img class="profile-photo" id="studentPhoto" alt="">
+      <div>
+        <h1 id="pageTitle">Student Report</h1>
+        <p class="page-sub" id="pageSub"></p>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-card-label">Total Sessions</div><div class="stat-card-value" id="statTotal">0</div></div>
+      <div class="stat-card accent-green"><div class="stat-card-label">Present</div><div class="stat-card-value" id="statPresent">0</div></div>
+      <div class="stat-card accent-amber"><div class="stat-card-label">Late</div><div class="stat-card-value" id="statLate">0</div></div>
+      <div class="stat-card accent-red"><div class="stat-card-label">Absent</div><div class="stat-card-value" id="statAbsent">0</div></div>
+      <div class="stat-card"><div class="stat-card-label">Excused</div><div class="stat-card-value" id="statExcused">0</div></div>
+      <div class="stat-card accent-blue"><div class="stat-card-label">Attendance %</div><div class="stat-card-value" id="statPct">0%</div></div>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Subject</th><th>Status</th><th>Time In</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initStudentReportPage } from '../js/student-report.js';
+
+  const profile = await requireRole(['admin', 'teacher']);
+  if (profile) {
+    renderShell(profile);
+    initStudentReportPage();
+  }
+</script>
+
+</body>
+</html>

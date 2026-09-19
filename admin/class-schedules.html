@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Schedule — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1 id="pageTitle">Class Schedule</h1>
+      <p class="page-sub" id="pageSub"></p>
+      <a class="back-link" href="/admin/class-assignments.html">&larr; Back to Class Assignments</a>
+    </div>
+
+    <div class="card form-card">
+      <form id="addForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fieldDay">Day</label>
+            <select id="fieldDay">
+              <option value="1">Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+              <option value="0">Sunday</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="fieldStart">Start Time</label>
+            <input type="time" id="fieldStart" required>
+          </div>
+          <div class="form-field">
+            <label for="fieldEnd">End Time</label>
+            <input type="time" id="fieldEnd" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add Schedule Slot</button>
+        </div>
+        <div class="form-error" id="formError"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div id="slotsList"></div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initClassSchedulesPage } from '../js/class-schedules.js';
+
+  const profile = await requireRole(['admin']);
+  if (profile) {
+    renderShell(profile);
+    initClassSchedulesPage();
+  }
+</script>
+
+</body>
+</html>

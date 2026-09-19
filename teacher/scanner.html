@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Scanner — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/scanner.css">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>Scan Attendance</h1>
+      <p class="page-sub" id="scannerStatus"></p>
+    </div>
+
+    <div class="scanner-layout">
+      <div class="card scanner-camera-card">
+        <div class="scanner-class-title" id="classTitle"></div>
+        <div class="scanner-late-label" id="lateAfterLabel"></div>
+        <div id="qr-reader"></div>
+        <div class="scanner-toolbar">
+          <button class="btn btn-secondary" id="manualBtn" type="button">Manual Attendance</button>
+          <button class="btn btn-danger" id="closeSessionBtn" type="button">Close Attendance</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-grid stat-grid-4" style="margin-bottom:14px;">
+          <div class="stat-card accent-green"><div class="stat-card-label">Present</div><div class="stat-card-value" id="statPresent">0</div></div>
+          <div class="stat-card accent-amber"><div class="stat-card-label">Late</div><div class="stat-card-value" id="statLate">0</div></div>
+          <div class="stat-card accent-red"><div class="stat-card-label">Absent</div><div class="stat-card-value" id="statAbsent">0</div></div>
+          <div class="stat-card"><div class="stat-card-label">Excused</div><div class="stat-card-value" id="statExcused">0</div></div>
+        </div>
+        <div class="card">
+          <div id="liveList"><div class="empty-state">No scans yet.</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box" id="confirmBox"></div>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initScannerPage } from '../js/scanner.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initScannerPage();
+  }
+</script>
+
+</body>
+</html>
