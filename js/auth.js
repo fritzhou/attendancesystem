@@ -69,8 +69,14 @@ export async function getCurrentProfile() {
  * Where to send a user right after a successful login,
  * based on their role.
  */
+const APP_ROOT = new URL('../', import.meta.url);
+
+export function appUrl(path = '') {
+  return new URL(path, APP_ROOT).href;
+}
+
 export function dashboardPathForRole(role) {
-  if (role === 'admin') return '/admin/dashboard.html';
-  if (role === 'teacher') return '/teacher/dashboard.html';
-  return '/login.html';
+  if (role === 'admin') return appUrl('admin/dashboard.html');
+  if (role === 'teacher') return appUrl('teacher/dashboard.html');
+  return appUrl('index.html');
 }

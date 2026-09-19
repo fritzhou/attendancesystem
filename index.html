@@ -134,9 +134,10 @@
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next');
 
-      window.location.href = next && next !== '/login.html'
-        ? next
-        : dashboardPathForRole(profile.role);
+      const appRoot = new URL('./', window.location.href).pathname;
+      const safeNext = next && next.startsWith(appRoot) ? next : null;
+
+      window.location.href = safeNext || dashboardPathForRole(profile.role);
 
     } catch (err) {
       errorBox.textContent = err.message;

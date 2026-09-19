@@ -2,7 +2,7 @@
 // Route guards. Every protected page calls requireRole() at the top
 // of its script before rendering anything sensitive.
 
-import { getCurrentProfile } from './auth.js';
+import { getCurrentProfile, appUrl } from './auth.js';
 
 /**
  * Ensures the current user is logged in AND has one of the
@@ -18,7 +18,7 @@ import { getCurrentProfile } from './auth.js';
  *
  *   const profile = await requireRole(['admin', 'teacher']);
  */
-export async function requireRole(allowedRoles, loginPath = '/login.html') {
+export async function requireRole(allowedRoles, loginPath = appUrl('index.html')) {
   const profile = await getCurrentProfile();
 
   if (!profile) {

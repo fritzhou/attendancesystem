@@ -3,7 +3,7 @@
 // Each protected page has empty <aside id="sidebar"> and
 // <header id="topbar"> elements — this fills them in based on role.
 
-import { signOut } from './auth.js';
+import { signOut, appUrl } from './auth.js';
 
 const NAV = {
   admin: [
@@ -34,9 +34,13 @@ const NAV = {
   ]
 };
 
+for (const item of Object.values(NAV).flat()) {
+  item.href = appUrl(item.href.replace(/^\//, ''));
+}
+
 export function renderShell(profile) {
   const items = NAV[profile.role] || [];
-  const path = window.location.pathname;
+  const path = window.location.href;
 
   const sidebar = document.getElementById('sidebar');
   const topbar = document.getElementById('topbar');
@@ -70,7 +74,7 @@ export function renderShell(profile) {
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await signOut();
-    window.location.href = '/login.html';
+    window.location.href = appUrl('index.html');
   });
 
   document.getElementById('sidebarToggle').addEventListener('click', () => {
@@ -89,3 +93,16 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href^="/admin/"], a[href^="/teacher/"], a[href="/login.html"]');
+  if (!link) return;
+
+  const href = link.getAttribute('href');
+  event.preventDefault();
+
+  window.location.href = href === '/login.html'
+    ? appUrl('index.html')
+    : appUrl(href.slice(1));
+});
