@@ -1,8 +1,9 @@
-// /js/students.js — Students list: search, filter, links to QR card / bulk print / report
+// /js/students.js — Students list: search, filter, add manually, links to QR card / bulk print / report
 
 import { supabase } from './supabaseClient.js';
 
 let allStudents = [];
+let sectionOptions = []; // { id, schoolYearId, label }
 
 export async function initStudentsPage() {
   await Promise.all([loadStudents(), loadSectionOptions()]);
@@ -12,6 +13,7 @@ export async function initStudentsPage() {
   document.getElementById('filterStatus').addEventListener('change', render);
   document.getElementById('filterSection').addEventListener('change', render);
   document.getElementById('printSectionBtn').addEventListener('click', goToSectionPrint);
+  document.getElementById('addStudentForm').addEventListener('submit', handleAddStudent);
 }
 
 async function loadStudents() {
@@ -34,15 +36,22 @@ async function loadStudents() {
 async function loadSectionOptions() {
   const { data } = await supabase
     .from('sections')
-    .select('id, grade_level, section_name, strands(code)')
+    .select('id, grade_level, section_name, school_year_id, strands(code), school_years(name)')
     .order('grade_level');
 
-  const options = (data || []).map(s =>
-    `<option value="${s.id}">Grade ${s.grade_level} – ${s.strands.code} / ${s.section_name}</option>`
-  ).join('');
+  sectionOptions = (data || []).map(s => ({
+    id: s.id,
+    schoolYearId: s.school_year_id,
+    label: `Grade ${s.grade_level} – ${s.strands.code}/${s.section_name} (${s.school_years.name})`
+  }));
 
-  document.getElementById('filterSection').innerHTML = `<option value="">All Sections</option>${options}`;
-  document.getElementById('printSectionSelect').innerHTML = `<option value="">Choose a section...</option>${options}`;
+  const filterOptions = sectionOptions.map(s => `<option value="${s.id}">${escapeHtml(s.label)}</option>`).join('');
+  document.getElementById('filterSection').innerHTML = `<option value="">All Sections</option>${filterOptions}`;
+  document.getElementById('printSectionSelect').innerHTML = `<option value="">Choose a section...</option>${filterOptions}`;
+
+  document.getElementById('addStudentSection').innerHTML = sectionOptions.length
+    ? sectionOptions.map(s => `<option value="${s.id}">${escapeHtml(s.label)}</option>`).join('')
+    : `<option value="">Add a section first (under Sections)</option>`;
 }
 
 function render() {
@@ -81,10 +90,69 @@ function render() {
   `).join('');
 }
 
+async function handleAddStudent(e) {
+  e.preventDefault();
+  const errorBox = document.getElementById('addStudentError');
+  errorBox.style.display = 'none';
+
+  const student_number = document.getElementById('addStudentNumber').value.trim();
+  const full_name = document.getElementById('addStudentName').value.trim();
+  const section_id = document.getElementById('addStudentSection').value;
+
+  if (!student_number || !full_name || !section_id) {
+    showAddError('Please fill in every field.');
+    return;
+  }
+
+  const section = sectionOptions.find(s => s.id === section_id);
+  if (!section) { showAddError('Please choose a valid section.'); return; }
+
+  const btn = document.getElementById('addStudentBtn');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  const { data: student, error: studentError } = await supabase
+    .from('students')
+    .insert({ student_number, full_name, registration_status: 'UNREGISTERED' })
+    .select('id')
+    .single();
+
+  if (studentError) {
+    btn.disabled = false;
+    btn.textContent = 'Add Student';
+    showAddError(studentError.message.includes('duplicate')
+      ? 'A student with this student number already exists.'
+      : 'Could not save. Please try again.');
+    return;
+  }
+
+  const { error: enrollError } = await supabase.from('enrollments').insert({
+    student_id: student.id, section_id: section.id, school_year_id: section.schoolYearId
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Add Student';
+
+  if (enrollError) {
+    showAddError('Student was created, but could not be enrolled in that section. Check Sections and try enrolling manually.');
+  } else {
+    document.getElementById('addStudentForm').reset();
+  }
+
+  await loadStudents();
+  render();
+}
+
 function goToSectionPrint() {
   const sectionId = document.getElementById('printSectionSelect').value;
   if (!sectionId) { alert('Choose a section first.'); return; }
   window.location.href = `/admin/qr-print-section.html?section=${sectionId}`;
+}
+
+function showAddError(msg) {
+  const errorBox = document.getElementById('addStudentError');
+  errorBox.textContent = msg;
+  errorBox.style.display = 'block';
 }
 
 function statusBadge(status) {
