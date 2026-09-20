@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Classes — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>My Classes</h1>
+      <p class="page-sub">Every class assignment you have, with its weekly schedule.</p>
+    </div>
+
+    <div id="classesList"><div class="empty-state">Loading...</div></div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initTeacherClassesPage } from '../js/teacher-classes.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initTeacherClassesPage(profile);
+  }
+</script>
+
+</body>
+</html>
