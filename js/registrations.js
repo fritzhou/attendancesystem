@@ -103,9 +103,27 @@ function updateBulkBar() {
   document.getElementById('bulkCount').textContent = selectedIds.size;
 }
 
+async function callReview(action, registrationId, reason) {
+  const { data, error } = await supabase.functions.invoke('registration-review', {
+    body: { action, registration_id: registrationId, reason }
+  });
+
+  if (error) {
+    let message = 'Could not process this registration.';
+    try {
+      const parsed = await error.context?.json?.();
+      if (parsed?.error) message = parsed.error;
+    } catch (e) {}
+    return { success: false, message };
+  }
+
+  if (data?.error) return { success: false, message: data.error };
+  return data;
+}
+
 async function approveOne(id) {
-  const { data, error } = await supabase.rpc('approve_registration', { p_registration_id: id });
-  if (error || !data.success) {
+  const data = await callReview('approve', id);
+  if (!data.success) {
     alert(data?.message || 'Could not approve this registration.');
     return;
   }
@@ -115,8 +133,8 @@ async function approveOne(id) {
 async function rejectOne(id) {
   const reason = prompt('Reason for rejecting this registration (shown so the student can fix and resubmit):');
   if (reason === null) return;
-  const { data, error } = await supabase.rpc('reject_registration', { p_registration_id: id, p_reason: reason || null });
-  if (error || !data.success) {
+  const data = await callReview('reject', id, reason || null);
+  if (!data.success) {
     alert(data?.message || 'Could not reject this registration.');
     return;
   }
@@ -137,10 +155,8 @@ async function bulkAction(kind) {
 
   let failed = 0;
   for (const id of ids) {
-    const { data, error } = kind === 'approve'
-      ? await supabase.rpc('approve_registration', { p_registration_id: id })
-      : await supabase.rpc('reject_registration', { p_registration_id: id, p_reason: reason || null });
-    if (error || !data.success) failed++;
+    const data = await callReview(kind, id, reason);
+    if (!data.success) failed++;
   }
 
   if (failed > 0) alert(`${ids.length - failed} succeeded, ${failed} failed. Check the list for what's left.`);
