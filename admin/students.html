@@ -15,7 +15,31 @@
   <main id="content">
     <div class="page-header">
       <h1>Students</h1>
-      <p class="page-sub">Search the full roster, and open a student's QR card once they're Active.</p>
+      <p class="page-sub">Search the full roster, add a student manually, and open a student's QR card once they're Active.</p>
+    </div>
+
+    <div class="card form-card">
+      <h2 class="section-title" style="margin-top:0;">Add Student Manually</h2>
+      <form id="addStudentForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="addStudentNumber">Student Number</label>
+            <input type="text" id="addStudentNumber" placeholder="2026-045" required>
+          </div>
+          <div class="form-field">
+            <label for="addStudentName">Full Name</label>
+            <input type="text" id="addStudentName" placeholder="Maria Santos" required>
+          </div>
+          <div class="form-field">
+            <label for="addStudentSection">Section</label>
+            <select id="addStudentSection"></select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="addStudentBtn">Add Student</button>
+        </div>
+        <div class="form-error" id="addStudentError"></div>
+      </form>
     </div>
 
     <div class="card form-card">
