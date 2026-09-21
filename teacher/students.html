@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Students — Pilgrim Attend</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+<aside id="sidebar"></aside>
+<div id="app">
+  <header id="topbar"></header>
+  <main id="content">
+    <div class="page-header">
+      <h1>My Students</h1>
+      <p class="page-sub">Every student across all of your assigned sections.</p>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-field">
+        <label for="searchInput">Search</label>
+        <input type="text" id="searchInput" placeholder="Name or student number">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Student #</th><th>Section</th><th>Actions</th></tr></thead>
+          <tbody id="studentsBody"><tr><td colspan="4" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireRole } from '../js/permissions.js';
+  import { renderShell } from '../js/layout.js';
+  import { initTeacherStudentsPage } from '../js/teacher-students.js';
+
+  const profile = await requireRole(['teacher']);
+  if (profile) {
+    renderShell(profile);
+    initTeacherStudentsPage(profile);
+  }
+</script>
+
+</body>
+</html>
